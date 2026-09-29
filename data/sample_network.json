@@ -1,0 +1,78 @@
+{
+  "entry_point": {
+    "id": "internet",
+    "name": "Internet",
+    "type": "ENTRY_POINT"
+  },
+  "hosts": [
+    {
+      "id": "web01",
+      "name": "Web Server",
+      "ip": "192.168.1.10",
+      "type": "HOST",
+      "services": [
+        {
+          "name": "HTTP",
+          "port": 80
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "CVE-2026-0001",
+          "cvss": 8.1,
+          "severity": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "app01",
+      "name": "App Server",
+      "ip": "192.168.1.20",
+      "type": "HOST",
+      "services": [
+        {
+          "name": "HTTP",
+          "port": 8080
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "CVE-2026-0002",
+          "cvss": 7.5,
+          "severity": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "db01",
+      "name": "Database",
+      "ip": "192.168.1.30",
+      "type": "CRITICAL_ASSET",
+      "services": [
+        {
+          "name": "MySQL",
+          "port": 3306
+        }
+      ],
+      "vulnerabilities": []
+    }
+  ],
+  "connections": [
+    {
+      "source": "internet",
+      "target": "web01"
+    },
+    {
+      "source": "internet",
+      "target": "app01"
+    },
+    {
+      "source": "web01",
+      "target": "db01"
+    },
+    {
+      "source": "app01",
+      "target": "db01"
+    }
+  ]
+}
