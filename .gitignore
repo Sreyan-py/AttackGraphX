@@ -5,3 +5,17 @@ __pycache__/
 .DS_Store
 .env
 *.db
+
+# Python environments and generated files
+.venv/
+venv/
+venv312/
+backend/.venv/
+backend/venv/
+backend/venv312/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.db
+*.sqlite
+*.sqlite3

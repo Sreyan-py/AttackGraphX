@@ -12,27 +12,28 @@ from ..services.attack_graph_service import (
 router = APIRouter(tags=["Attack Graph"])
 
 
-def get_demo_connections():
-    """Return a simulated connection for testing only."""
-    return [
-        {
-            "source": "host_1",
-            "target": "host_2",
-            "verified": False,
-        }
-    ]
+def create_graph(db: Session):
+    """
+    Build a graph from discovered hosts.
+
+    No network connections are invented. Until verified connection
+    data is available, the graph contains host nodes without edges.
+    """
+    hosts = db.query(Host).order_by(Host.id).all()
+
+    try:
+        graph = build_attack_graph(hosts, connections=[])
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return graph
 
 
 @router.get("/attack-graph")
 def get_attack_graph(db: Session = Depends(get_db)):
-    """Build an attack graph from discovered hosts."""
+    """Return graph nodes and explicitly known edges."""
 
-    hosts = db.query(Host).all()
-
-    graph = build_attack_graph(
-        hosts,
-        connections=get_demo_connections(),
-    )
+    graph = create_graph(db)
 
     nodes = [
         {"id": node_id, **attributes}
@@ -58,14 +59,9 @@ def get_attack_paths(
     target_host_id: str,
     db: Session = Depends(get_db),
 ):
-    """Find paths between two host nodes."""
+    """Find candidate paths through known graph connections."""
 
-    hosts = db.query(Host).all()
-
-    graph = build_attack_graph(
-        hosts,
-        connections=get_demo_connections(),
-    )
+    graph = create_graph(db)
 
     try:
         paths = find_attack_paths(
