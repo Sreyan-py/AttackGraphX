@@ -37,3 +37,36 @@ class Vulnerability(Base):
     source = Column(String(100), default="nmap")
     detected_at = Column(DateTime, default=datetime.utcnow)
     host = relationship("Host", back_populates="vulnerabilities")
+
+
+from sqlalchemy import Boolean, UniqueConstraint
+
+
+class NetworkConnection(Base):
+    __tablename__ = "network_connections"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "source_host_id",
+            "target_host_id",
+            name="unique_host_connection"
+        ),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    source_host_id = Column(
+        Integer, ForeignKey("hosts.id"), nullable=False
+    )
+
+    target_host_id = Column(
+        Integer, ForeignKey("hosts.id"), nullable=False
+    )
+
+    relationship_type = Column(
+        String(100), default="CONNECTED_TO"
+    )
+
+    verified = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
